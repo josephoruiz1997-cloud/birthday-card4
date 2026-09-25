@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Happy Birthday Baby ✨</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            serif: ['"Playfair Display"', 'serif'],
+            script: ['"Great Vibes"', 'cursive'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Prevent rubber-banding and ensure mobile touch precision */
+    html, body {
+      overscroll-behavior-y: none;
+      -webkit-tap-highlight-color: transparent;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
+    }
+
+    /* 3D Envelope Transformations */
+    .perspective-1000 {
+      perspective: 1000px;
+      -webkit-perspective: 1000px;
+    }
+
+    .envelope-flap {
+      transform-origin: top center;
+      transition: transform 0.75s cubic-bezier(0.34, 1.25, 0.64, 1);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .envelope.open .envelope-flap {
+      transform: rotateX(180deg);
+      z-index: 5;
+    }
+
+    .envelope-letter {
+      transition: transform 0.85s cubic-bezier(0.2, 0.9, 0.3, 1.2) 0.25s, opacity 0.4s ease;
+      will-change: transform;
+    }
+
+    .envelope.open .envelope-letter {
+      transform: translateY(-90px) scale(1.02);
+    }
+
+    @media (max-width: 480px) {
+      .envelope.open .envelope-letter {
+        transform: translateY(-78px) scale(1.02);
+      }
+    }
+
+    /* Candle flame flickering animation */
+    @keyframes flameFlicker {
+      0%, 100% {
+        transform: translateX(-50%) scale(1) rotate(-1.5deg);
+        filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.9));
+      }
+      50% {
+        transform: translateX(-50%) scale(1.18, 1.25) rotate(2deg);
+        filter: drop-shadow(0 0 16px rgba(245, 158, 11, 1));
+      }
+    }
+
+    .candle-flame {
+      animation: flameFlicker 0.6s infinite alternate ease-in-out;
+      transform-origin: bottom center;
+    }
+
+    /* Blown-out candle smoke puff */
+    @keyframes smokePuff {
+      0% { opacity: 0.9; transform: translate(-50%, 0) scale(0.6); }
+      100% { opacity: 0; transform: translate(-50%, -45px) scale(2.4); }
+    }
+
+    .smoke-particle {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: rgba(226, 232, 240, 0.8);
+      border-radius: 50%;
+      filter: blur(4px);
+      pointer-events: none;
+      animation: smokePuff 1.1s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    }
+
+    /* Touch isolation for scratch-off canvas to prevent scroll locking */
+    .scratch-canvas-area {
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* Subtle ambient floating sparkles */
+    @keyframes floatParticle {
+      0% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+      50% { opacity: 0.8; }
+      100% { transform: translateY(-70px) rotate(45deg); opacity: 0; }
+    }
+
+    .ambient-sparkle {
+      position: absolute;
+      pointer-events: none;
+      animation: floatParticle 4s ease-in-out infinite;
+      color: rgba(251, 191, 36, 0.7);
+      user-select: none;
+    }
+
+    /* Color Glows */
+    .glow-rose {
+      box-shadow: 0 0 40px -5px rgba(244, 63, 94, 0.35);
+    }
+    .glow-gold {
+      box-shadow: 0 0 40px -5px rgba(234, 179, 8, 0.35);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 40px -5px rgba(34, 211, 238, 0.35);
+    }
+    .glow-purple {
+      box-shadow: 0 0 40px -5px rgba(168, 85, 247, 0.35);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-rose-500 selection:text-white relative overflow-x-hidden antialiased">
+
+  <!-- Ambient Glow Orbs -->
+  <div id="ambient-orb-1" class="fixed -top-24 -left-24 w-72 h-72 sm:w-96 sm:h-96 bg-rose-600/25 rounded-full blur-3xl pointer-events-none transition-colors duration-1000"></div>
+  <div id="ambient-orb-2" class="fixed top-1/3 -right-24 w-72 h-72 sm:w-96 sm:h-96 bg-pink-600/20 rounded-full blur-3xl pointer-events-none transition-colors duration-1000"></div>
+  <div id="ambient-orb-3" class="fixed -bottom-24 left-1/4 w-72 h-72 sm:w-96 sm:h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none transition-colors duration-1000"></div>
+
+  <!-- Header Navigation -->
+  <header class="relative z-40 max-w-5xl mx-auto px-3.5 py-3.5 sm:px-6 sm:py-4 flex items-center justify-between">
+    <div class="flex items-center space-x-2.5">
+      <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-rose-500 via-pink-400 to-amber-300 p-[2px] shadow-md shadow-rose-500/20 flex-shrink-0">
+        <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center text-lg sm:text-xl">
+          💖
+        </div>
+      </div>
+      <div class="leading-tight">
+        <h1 class="text-sm sm:text-base font-bold tracking-wide bg-gradient-to-r from-rose-200 via-pink-200 to-amber-200 bg-clip-text text-transparent">
+          For Baby ✨
+        </h1>
+        <p class="text-[11px] text-slate-400">September 25, 2026 Celebration</p>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="flex items-center space-x-2">
+      <!-- Audio Toggle Button -->
+      <button id="audio-toggle-btn" class="min-w-[44px] min-h-[44px] p-2.5 rounded-xl bg-slate-900/80 active:scale-95 border border-slate-700/60 text-slate-300 transition-all flex items-center justify-center space-x-1.5 text-xs backdrop-blur-md shadow-sm" aria-label="Toggle Sound">
+        <span id="audio-icon" class="text-base">🔊</span>
+        <span class="hidden md:inline text-[11px]">Sound: <span id="audio-status" class="text-emerald-400 font-semibold">ON</span></span>
+      </button>
+
+      <!-- Confetti Launcher -->
+      <button id="poppers-btn" class="min-w-[44px] min-h-[44px] p-2.5 rounded-xl bg-gradient-to-r from-rose-500/20 to-pink-500/20 active:scale-95 border border-rose-500/40 text-rose-300 transition-all flex items-center justify-center space-x-1.5 text-xs backdrop-blur-md shadow-sm" aria-label="Trigger Confetti">
+        <span class="text-base">🎉</span>
+        <span class="hidden md:inline text-[11px]">Popper</span>
+      </button>
+
+      <!-- Desktop Customize Button -->
+      <button id="open-editor-btn" class="hidden sm:flex min-h-[44px] px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-500 via-pink-500 to-amber-400 text-slate-950 font-bold text-xs transition-transform active:scale-95 shadow-md items-center space-x-1.5">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+        </svg>
+        <span>Customize & Share</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="relative z-30 max-w-4xl mx-auto px-3.5 sm:px-6 py-3 space-y-7 sm:space-y-11 pb-24">
+
+    <!-- Countdown Section -->
+    <section class="text-center space-y-3 sm:space-y-4">
+      <!-- Romantic & Natural Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-rose-500/30 text-xs text-rose-200/95 backdrop-blur-md shadow-lg shadow-rose-950/40">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+        </span>
+        <span id="countdown-badge-label" class="tracking-wide font-medium">Counting down to your midnight moment ✨</span>
+      </div>
+
+      <h2 id="countdown-title" class="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-serif bg-gradient-to-b from-white via-rose-100 to-slate-400 bg-clip-text text-transparent px-2">
+        The Birthday Countdown
+      </h2>
+      <p id="countdown-subtitle" class="text-slate-400 text-xs sm:text-sm max-w-md mx-auto px-4">
+        Friday, September 25, 2026 • 12:00 AM (EDT)
+      </p>
+
+      <!-- 4-Box Wrap-Free Responsive Timer -->
+      <div id="countdown-boxes-container" class="grid grid-cols-4 gap-1.5 sm:gap-3 max-w-md sm:max-w-lg mx-auto pt-1 px-1">
+        <!-- Days -->
+        <div class="bg-slate-900/85 border border-slate-800 backdrop-blur-md p-2 sm:p-3.5 rounded-xl sm:rounded-2xl shadow-lg flex flex-col items-center justify-center">
+          <span id="cd-days" class="text-xl sm:text-3xl font-extrabold text-rose-400 tracking-tight">00</span>
+          <span class="text-[9px] sm:text-[11px] text-slate-400 uppercase tracking-wider mt-0.5 font-medium">Days</span>
+        </div>
+        <!-- Hours -->
+        <div class="bg-slate-900/85 border border-slate-800 backdrop-blur-md p-2 sm:p-3.5 rounded-xl sm:rounded-2xl shadow-lg flex flex-col items-center justify-center">
+          <span id="cd-hours" class="text-xl sm:text-3xl font-extrabold text-pink-400 tracking-tight">00</span>
+          <span class="text-[9px] sm:text-[11px] text-slate-400 uppercase tracking-wider mt-0.5 font-medium">Hours</span>
+        </div>
+        <!-- Minutes -->
+        <div class="bg-slate-900/85 border border-slate-800 backdrop-blur-md p-2 sm:p-3.5 rounded-xl sm:rounded-2xl shadow-lg flex flex-col items-center justify-center">
+          <span id="cd-minutes" class="text-xl sm:text-3xl font-extrabold text-amber-300 tracking-tight">00</span>
+          <span class="text-[9px] sm:text-[11px] text-slate-400 uppercase tracking-wider mt-0.5 font-medium">Mins</span>
+        </div>
+        <!-- Seconds -->
+        <div class="bg-slate-900/85 border border-slate-800 backdrop-blur-md p-2 sm:p-3.5 rounded-xl sm:rounded-2xl shadow-lg flex flex-col items-center justify-center">
+          <span id="cd-seconds" class="text-xl sm:text-3xl font-extrabold text-emerald-400 tracking-tight">00</span>
+          <span class="text-[9px] sm:text-[11px] text-slate-400 uppercase tracking-wider mt-0.5 font-medium">Secs</span>
+        </div>
+      </div>
+
+      <!-- Preview Celebration Toggle -->
+      <div class="pt-1 flex items-center justify-center">
+        <button id="btn-force-celebrate" class="min-h-[44px] text-xs px-4 py-2 rounded-full bg-slate-800/80 active:scale-95 text-rose-300 border border-rose-500/30 transition-all flex items-center gap-1.5 shadow-sm">
+          <span>✨</span>
+          <span id="celebrate-btn-text">Preview Celebration Mode</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 3D Interactive Envelope -->
+    <section class="perspective-1000 flex flex-col items-center justify-center pt-2">
+      <div class="text-center mb-3">
+        <span class="inline-block px-3.5 py-1 rounded-full bg-slate-800/70 text-rose-200 text-[11px] tracking-wide uppercase font-semibold border border-slate-700/80 shadow">
+          Tap wax seal to open card
+        </span>
+      </div>
+
+      <!-- Envelope Container -->
+      <div id="envelope-wrapper" class="relative w-full max-w-[340px] sm:max-w-md cursor-pointer group select-none">
+        
+        <div id="envelope" class="envelope relative w-full h-64 sm:h-72 bg-slate-900/90 rounded-2xl border border-slate-700/80 shadow-2xl overflow-visible transition-transform duration-300">
+          
+          <!-- Flap Triangle (Top) -->
+          <div class="envelope-flap absolute top-0 left-0 right-0 h-32 sm:h-36 bg-gradient-to-b from-slate-800 to-slate-900 rounded-t-2xl z-20 border-b border-rose-500/30 flex items-center justify-center shadow-lg"
+               style="clip-path: polygon(0 0, 100% 0, 50% 100%);">
+            
+            <!-- Wax Seal Stamp with "B" Initial -->
+            <button id="wax-seal" class="w-13 h-13 sm:w-14 sm:h-14 min-w-[50px] min-h-[50px] rounded-full bg-gradient-to-tr from-rose-600 via-pink-500 to-amber-400 shadow-xl border-2 border-rose-200 flex items-center justify-center -translate-y-2 transform active:scale-95 transition-transform" aria-label="Open Birthday Envelope">
+              <span class="text-slate-950 font-serif font-black text-xl">B</span>
+            </button>
+          </div>
+
+          <!-- Inside Letter Peek -->
+          <div id="card-inside" class="envelope-letter absolute inset-x-3.5 top-8 bottom-3 sm:inset-x-4 sm:top-10 sm:bottom-4 bg-gradient-to-b from-slate-800 to-slate-900 rounded-xl p-4 sm:p-5 border border-slate-700/70 shadow-2xl flex flex-col items-center justify-between text-center opacity-90">
+            <div class="space-y-1.5 sm:space-y-2">
+              <p class="font-script text-2xl sm:text-3xl text-rose-300">Happy Birthday</p>
+              <h3 id="card-inner-name" class="font-serif text-xl sm:text-2xl font-bold text-white leading-tight">Baby! 💕</h3>
+              <div class="h-0.5 w-12 bg-gradient-to-r from-transparent via-rose-400 to-transparent mx-auto my-1"></div>
+              <p id="card-inner-preview-text" class="text-[11px] sm:text-xs text-slate-300 line-clamp-3 italic px-1">
+                "Happy Birthday to my favorite person! 🎉🎂 Aunque estemos lejos hoy, sé que when we see each other we’ll pick up right where we left off and celebrate. Te quiero con todo mi corazón ✨💕"
+              </p>
+            </div>
+            
+            <button id="read-full-card-btn" class="w-full min-h-[44px] py-2 px-3 rounded-xl bg-gradient-to-r from-rose-500 via-pink-500 to-amber-400 active:scale-95 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-md transition-transform flex items-center justify-center gap-1">
+              <span>Read Full Message</span>
+              <span>↓</span>
+            </button>
+          </div>
+
+          <!-- Front Pocket V-Cut Overlay -->
+          <div class="absolute inset-0 pointer-events-none rounded-2xl z-10 border-t-0 border border-slate-700/70"
+               style="background: linear-gradient(135deg, rgba(30,41,59,0.85) 0%, rgba(15,23,42,0.95) 100%); clip-path: polygon(0 40%, 50% 75%, 100% 40%, 100% 100%, 0 100%);">
+            <div class="absolute bottom-3 left-0 right-0 text-center">
+              <span class="text-[11px] font-semibold text-rose-400/90 tracking-widest uppercase">Tap To Open</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Card Content Plaque -->
+    <section id="full-card-section" class="pt-4 space-y-6 sm:space-y-8 transition-all duration-700">
+      
+      <div id="main-card-plaque" class="relative rounded-3xl p-5 sm:p-8 md:p-10 bg-slate-900/90 border border-slate-800 shadow-2xl backdrop-blur-xl overflow-hidden glow-rose transition-all duration-500">
+        
+        <div class="absolute top-2.5 left-2.5 text-rose-400/30 text-xl font-serif">✦</div>
+        <div class="absolute top-2.5 right-2.5 text-rose-400/30 text-xl font-serif">✦</div>
+
+        <!-- Card Header -->
+        <div class="text-center space-y-2">
+          <p class="font-script text-3xl sm:text-5xl text-rose-300 drop-shadow">Happy Birthday</p>
+          <h2 id="card-hero-name" class="font-serif text-2xl sm:text-4xl font-extrabold tracking-wide bg-gradient-to-r from-rose-300 via-pink-200 to-amber-200 bg-clip-text text-transparent px-2">
+            Dearest Baby 💕
+          </h2>
+          <p class="text-[10px] sm:text-xs tracking-widest text-slate-400 uppercase font-medium">To My Favorite Person In The Entire World</p>
+        </div>
+
+        <!-- Full Custom Message -->
+        <div class="my-5 sm:my-7 max-w-xl mx-auto text-center px-1">
+          <div class="p-4 sm:p-6 rounded-2xl bg-slate-950/60 border border-rose-500/20 backdrop-blur-md shadow-inner">
+            <p id="card-full-message" class="text-sm sm:text-base text-rose-100 leading-relaxed font-light whitespace-pre-line italic">
+              "Happy Birthday to my favorite person! 🎉🎂 Aunque estemos lejos hoy, sé que when we see each other we’ll pick up right where we left off and celebrate. Te quiero con todo mi corazón ✨💕"
+            </p>
+          </div>
+        </div>
+
+        <!-- Interactive Activities: Virtual Cake + Scratch Voucher -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 pt-2">
+          
+          <!-- Cake Activity -->
+          <div class="bg-slate-950/70 border border-slate-800/80 rounded-2xl p-4 sm:p-5 text-center space-y-3 flex flex-col items-center justify-between relative shadow-inner">
+            <div class="flex items-center justify-between w-full">
+              <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Birthday Wish</span>
+              <span id="cake-status-badge" class="px-2.5 py-1 text-[10px] rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium">Candles Lit 🔥</span>
+            </div>
+
+            <!-- Virtual Cake -->
+            <div id="cake-container" class="relative my-3 cursor-pointer select-none active:scale-95 transition-transform" title="Tap candles to blow them out!">
+              <!-- Candles -->
+              <div class="flex items-end justify-center space-x-4 sm:space-x-5 h-16 sm:h-20 relative z-20">
+                <div class="candle flex flex-col items-center relative min-w-[36px]">
+                  <div class="candle-flame w-3.5 h-5 bg-gradient-to-t from-rose-500 via-yellow-300 to-white rounded-full"></div>
+                  <div class="w-1.5 h-8 sm:h-10 bg-gradient-to-b from-rose-300 to-rose-500 rounded-sm shadow"></div>
+                </div>
+                <div class="candle flex flex-col items-center relative min-w-[36px]">
+                  <div class="candle-flame w-4 h-6 bg-gradient-to-t from-amber-500 via-yellow-300 to-white rounded-full"></div>
+                  <div class="w-1.5 h-10 sm:h-12 bg-gradient-to-b from-pink-200 to-pink-400 rounded-sm shadow"></div>
+                </div>
+                <div class="candle flex flex-col items-center relative min-w-[36px]">
+                  <div class="candle-flame w-3.5 h-5 bg-gradient-to-t from-rose-500 via-yellow-300 to-white rounded-full"></div>
+                  <div class="w-1.5 h-8 sm:h-10 bg-gradient-to-b from-purple-300 to-purple-500 rounded-sm shadow"></div>
+                </div>
+              </div>
+
+              <!-- Top Tier -->
+              <div class="w-40 sm:w-48 h-12 bg-gradient-to-r from-rose-400 via-pink-300 to-rose-400 rounded-2xl -mt-2 shadow-lg relative z-10 border-t border-white/50 flex items-center justify-center">
+                <div class="absolute -bottom-1 inset-x-2 flex justify-between text-rose-200/90 text-xs">
+                  <span>♥</span><span>♥</span><span>♥</span><span>♥</span><span>♥</span><span>♥</span>
+                </div>
+              </div>
+              <!-- Cake Base -->
+              <div class="w-52 sm:w-60 h-14 bg-gradient-to-r from-amber-100 via-orange-100 to-amber-200 rounded-2xl -mt-3 shadow-xl border-t border-amber-300/40 relative flex items-center justify-center">
+                <span class="text-[10px] font-bold tracking-widest text-slate-700/70 uppercase">★ FOR MY BABY ★</span>
+              </div>
+              <!-- Plate -->
+              <div class="w-56 sm:w-64 h-3.5 bg-slate-300 rounded-full mx-auto -mt-1 shadow-md border-b-2 border-slate-400"></div>
+            </div>
+
+            <p class="text-xs text-slate-300">
+              <strong class="text-white">Tap the candles</strong> to blow them out & make your wish!
+            </p>
+            <button id="relight-cake-btn" class="hidden min-h-[44px] text-xs text-rose-300 underline underline-offset-4 active:text-rose-200 flex items-center justify-center">
+              🕯️ Relight candles
+            </button>
+          </div>
+
+          <!-- Scratch-Off Card Activity -->
+          <div class="bg-slate-950/70 border border-slate-800/80 rounded-2xl p-4 sm:p-5 text-center space-y-3 flex flex-col items-center justify-between relative shadow-inner">
+            <div class="flex items-center justify-between w-full">
+              <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Secret Voucher For You</span>
+              <span id="scratch-percent-badge" class="px-2.5 py-1 text-[10px] rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-medium">0% Scratched</span>
+            </div>
+
+            <!-- Scratch Canvas Frame -->
+            <div id="scratch-card-box" class="scratch-canvas-area relative w-full max-w-[270px] sm:max-w-xs h-36 rounded-xl overflow-hidden border-2 border-rose-400/40 shadow-xl select-none">
+              <!-- Hidden Prize Voucher -->
+              <div id="scratch-secret-content" class="absolute inset-0 bg-gradient-to-tr from-rose-500 via-pink-600 to-amber-500 flex flex-col items-center justify-center p-3 text-center select-none text-white">
+                <span class="text-2xl">🎁</span>
+                <span class="text-[10px] uppercase tracking-wider font-semibold text-amber-200">Reunion Voucher</span>
+                <p id="scratch-secret-text" class="text-xs sm:text-sm font-bold mt-1 text-white drop-shadow leading-tight px-1">
+                  Un buen relaxing massage whenever you need to recharge, followed by sexy time and a home-cooked meal hecho por mí.
+                </p>
+                <span class="text-[9px] text-pink-100 mt-1 opacity-90">Valid anytime, anywhere</span>
+              </div>
+
+              <!-- Canvas Scratch Layer -->
+              <canvas id="scratch-canvas" class="scratch-canvas-area absolute inset-0 w-full h-full cursor-pointer z-10"></canvas>
+            </div>
+
+            <p class="text-xs text-slate-300">
+              Drag your finger to <strong class="text-white">scratch off the foil</strong>!
+            </p>
+
+            <button id="reset-scratch-btn" class="min-h-[44px] text-xs text-rose-300 underline underline-offset-4 active:text-rose-200 flex items-center justify-center">
+              ✨ Re-coat scratch voucher
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Ambient Romantic Message Bottom Note -->
+        <div class="mt-6 pt-5 border-t border-slate-800/80 text-center space-y-1">
+          <p class="font-script text-xl sm:text-2xl text-rose-300">Con todo mi amor y cariño ✨</p>
+          <p class="text-[11px] text-slate-400">Can't wait to be together and celebrate in person.</p>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Mobile Floating Customizer Button -->
+  <button id="mobile-fab-btn" class="sm:hidden fixed bottom-6 right-5 z-40 w-13 h-13 min-w-[52px] min-h-[52px] rounded-full bg-gradient-to-r from-rose-500 to-amber-400 text-slate-950 font-bold shadow-2xl flex items-center justify-center active:scale-90 transition-transform border-2 border-white/30" aria-label="Open Card Editor">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+    </svg>
+  </button>
+
+  <!-- Customization Sheet / Modal -->
+  <div id="editor-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom duration-300">
+      
+      <div class="pt-3 pb-2 px-5 border-b border-slate-800 flex flex-col items-center">
+        <div class="w-12 h-1.5 bg-slate-700 rounded-full mb-3 sm:hidden"></div>
+        <div class="flex items-center justify-between w-full">
+          <div>
+            <h3 class="font-bold text-base sm:text-lg text-white">Customize Birthday Card</h3>
+            <p class="text-[11px] text-slate-400">Settings & Shareable URL generator</p>
+          </div>
+          <button id="close-editor-btn" class="min-w-[44px] min-h-[44px] rounded-xl text-slate-400 active:text-white flex items-center justify-center text-lg" aria-label="Close dialog">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-4 overflow-y-auto">
+        <div class="space-y-1">
+          <label class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Recipient Name / Nickname</label>
+          <input id="input-recipient-name" type="text" value="Baby" 
+                 class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700 text-sm text-white focus:outline-none focus:border-rose-400" />
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Target Date & Time (ISO / EDT)</label>
+          <input id="input-target-date" type="text" value="2026-09-25T00:00:00-04:00" 
+                 class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700 text-sm text-white focus:outline-none focus:border-rose-400" />
+          <p class="text-[10px] text-slate-400">Configured to: Friday, Sep 25, 2026 at 12:00 AM (EDT / GMT-4)</p>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Personal Note</label>
+          <textarea id="input-card-message" rows="3" 
+                    class="w-full p-3 rounded-xl bg-slate-800/90 border border-slate-700 text-sm text-white focus:outline-none focus:border-rose-400">Happy Birthday to my favorite person! 🎉🎂 Aunque estemos lejos hoy, sé que when we see each other we’ll pick up right where we left off and celebrate. Te quiero con todo mi corazón ✨💕</textarea>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Secret Scratch-Off Prize</label>
+          <input id="input-scratch-secret" type="text" value="Un buen relaxing massage whenever you need to recharge, followed by sexy time and a home-cooked meal hecho por mí." 
+                 class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700 text-sm text-white focus:outline-none focus:border-rose-400" />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Color Palette</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button data-theme="rose" class="theme-option min-h-[44px] p-2 rounded-xl border border-rose-500/50 bg-rose-500/10 active:bg-rose-500/25 text-xs font-medium text-rose-300 text-center">
+              Rose Romance
+            </button>
+            <button data-theme="gold" class="theme-option min-h-[44px] p-2 rounded-xl border border-amber-500/50 bg-amber-500/10 active:bg-amber-500/25 text-xs font-medium text-amber-300 text-center">
+              Midnight Gold
+            </button>
+            <button data-theme="violet" class="theme-option min-h-[44px] p-2 rounded-xl border border-purple-500/50 bg-purple-500/10 active:bg-purple-500/25 text-xs font-medium text-purple-300 text-center">
+              Royal Violet
+            </button>
+            <button data-theme="cyber" class="theme-option min-h-[44px] p-2 rounded-xl border border-cyan-500/50 bg-cyan-500/10 active:bg-cyan-500/25 text-xs font-medium text-cyan-300 text-center">
+              Neon Dream
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5 border-t border-slate-800 bg-slate-900/90 flex items-center justify-between gap-2.5">
+        <button id="copy-share-link-btn" class="min-h-[44px] flex-1 px-3 py-2.5 rounded-xl bg-slate-800 active:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 flex items-center justify-center gap-1.5">
+          <span>📤</span>
+          <span id="copy-btn-text">Share Link</span>
+        </button>
+        <button id="save-customizer-btn" class="min-h-[44px] flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-amber-400 text-slate-950 font-bold text-xs sm:text-sm active:scale-95 shadow-md flex items-center justify-center">
+          Apply & Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed top-4 inset-x-4 sm:inset-x-auto sm:top-auto sm:bottom-6 sm:right-6 z-50 transform -translate-y-20 sm:translate-y-24 opacity-0 transition-all duration-300 px-4 py-3 rounded-2xl bg-slate-900/95 border border-slate-700 text-white text-xs sm:text-sm shadow-2xl flex items-center justify-center sm:justify-start space-x-2 backdrop-blur-md">
+    <span id="toast-icon">✨</span>
+    <span id="toast-msg">Updated successfully!</span>
+  </div>
+
+  <script>
+    /* Audio and Synthesizer */
+    let audioCtx = null;
+    let audioEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function triggerHaptic(duration = 20) {
+      if (navigator.vibrate) {
+        try { navigator.vibrate(duration); } catch(e) {}
+      }
+    }
+
+    function playBlowCandleSound() {
+      if (!audioEnabled) return;
+      try {
+        initAudio();
+        if (!audioCtx) return;
+
+        const bufferSize = audioCtx.sampleRate * 0.35;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const output = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+        }
+
+        const whiteNoise = audioCtx.createBufferSource();
+        whiteNoise.buffer = buffer;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(650, audioCtx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.35);
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+
+        whiteNoise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        whiteNoise.start();
+      } catch (e) {}
+    }
+
+    function playHappyChimeChord() {
+      if (!audioEnabled) return;
+      try {
+        initAudio();
+        if (!audioCtx) return;
+
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = 'sine';
+          const startTime = audioCtx.currentTime + (idx * 0.08);
+          osc.frequency.setValueAtTime(freq, startTime);
+
+          gain.gain.setValueAtTime(0.18, startTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 1.1);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(startTime);
+          osc.stop(startTime + 1.1);
+        });
+      } catch (e) {}
+    }
+
+    function showToast(msg, icon = '✨') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toastMsg.innerText = msg;
+      toastIcon.innerText = icon;
+
+      toast.classList.remove('-translate-y-20', 'translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.add('-translate-y-20', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 3000);
+    }
+
+    // Audio status toggle listener
+    const audioToggleBtn = document.getElementById('audio-toggle-btn');
+    const audioStatusText = document.getElementById('audio-status');
+    const audioIcon = document.getElementById('audio-icon');
+
+    audioToggleBtn.addEventListener('click', () => {
+      initAudio();
+      audioEnabled = !audioEnabled;
+      if (audioEnabled) {
+        audioStatusText.innerText = 'ON';
+        audioStatusText.className = 'text-emerald-400 font-semibold';
+        audioIcon.innerText = '🔊';
+        playHappyChimeChord();
+      } else {
+        audioStatusText.innerText = 'OFF';
+        audioStatusText.className = 'text-rose-400 font-semibold';
+        audioIcon.innerText = '🔇';
+      }
+      triggerHaptic(15);
+    });
+
+    // Exact requested target: 12:00 AM Friday, Sep 25, 2026 (EDT / GMT-4)
+    const TARGET_TIME_ISO = "2026-09-25T00:00:00-04:00";
+
+    const cardState = {
+      name: 'Baby',
+      targetDate: TARGET_TIME_ISO,
+      message: "Happy Birthday to my favorite person! 🎉🎂 Aunque estemos lejos hoy, sé que when we see each other we’ll pick up right where we left off and celebrate. Te quiero con todo mi corazón ✨💕",
+      scratchSecret: "Un buen relaxing massage whenever you need to recharge, followed by sexy time and a home-cooked meal hecho por mí.",
+      theme: 'rose',
+      isEnvelopeOpen: false,
+      candlesLit: true,
+      forcedCelebration: false
+    };
+
+    function loadStateFromURL() {
+      try {
+        if (window.location.hash.length > 2) {
+          const hashData = JSON.parse(decodeURIComponent(atob(window.location.hash.substring(1))));
+          if (hashData.name) cardState.name = hashData.name;
+          if (hashData.targetDate) cardState.targetDate = hashData.targetDate;
+          if (hashData.message) cardState.message = hashData.message;
+          if (hashData.scratchSecret) cardState.scratchSecret = hashData.scratchSecret;
+          if (hashData.theme) cardState.theme = hashData.theme;
+        }
+      } catch (e) {
+        console.warn('Could not decode URL configuration', e);
+      }
+    }
+
+    function syncStateToDOM() {
+      const badgeLabel = document.getElementById('countdown-badge-label');
+      if (badgeLabel) badgeLabel.innerText = "Counting down to your midnight moment ✨";
+
+      const innerName = document.getElementById('card-inner-name');
+      if (innerName) innerName.innerText = cardState.name + '! 💕';
+
+      const heroName = document.getElementById('card-hero-name');
+      if (heroName) heroName.innerText = 'Dearest ' + cardState.name + ' 💕';
+
+      const previewText = document.getElementById('card-inner-preview-text');
+      if (previewText) previewText.innerText = `"${cardState.message}"`;
+
+      const fullMsg = document.getElementById('card-full-message');
+      if (fullMsg) fullMsg.innerText = `"${cardState.message}"`;
+
+      const secretText = document.getElementById('scratch-secret-text');
+      if (secretText) secretText.innerText = cardState.scratchSecret;
+
+      const inputName = document.getElementById('input-recipient-name');
+      if (inputName) inputName.value = cardState.name;
+
+      const inputTarget = document.getElementById('input-target-date');
+      if (inputTarget) inputTarget.value = cardState.targetDate;
+
+      const inputMsg = document.getElementById('input-card-message');
+      if (inputMsg) inputMsg.value = cardState.message;
+
+      const inputSecret = document.getElementById('input-scratch-secret');
+      if (inputSecret) inputSecret.value = cardState.scratchSecret;
+
+      applyTheme(cardState.theme);
+    }
+
+    function applyTheme(themeName) {
+      cardState.theme = themeName;
+      const plaque = document.getElementById('main-card-plaque');
+      const orb1 = document.getElementById('ambient-orb-1');
+      const orb2 = document.getElementById('ambient-orb-2');
+
+      plaque.classList.remove('glow-gold', 'glow-rose', 'glow-cyan', 'glow-purple');
+
+      if (themeName === 'rose') {
+        plaque.classList.add('glow-rose');
+        orb1.className = 'fixed -top-24 -left-24 w-72 h-72 sm:w-96 sm:h-96 bg-rose-500/25 rounded-full blur-3xl pointer-events-none transition-colors duration-1000';
+        orb2.className = 'fixed top-1/3 -right-24 w-72 h-72 sm:w-96 sm:h-96 bg-pink-600/20 rounded-full blur-3xl pointer-events-none transition-colors duration-1000';
+      } else if (themeName === 'gold') {
+        plaque.classList.add('glow-gold');
+        orb1.className = 'fixed -top-24 -left-24 w-72 h-72 sm:w-96 sm:h-96 bg-amber-500/20 rounded-full blur-3xl pointer-events-none transition-colors duration-1000';
+        orb2.className = 'fixed top-1/3 -right-24 w-72 h-72 sm:w-96 sm:h-96 bg-yellow-600/15 rounded-full blur-3xl pointer-events-none transition-colors duration-1000';
+      } else if (themeName === 'cyber') {
+        plaque.classList.add('glow-cyan');
+        orb1.className = 'fixed -top-24 -left-24 w-72 h-72 sm:w-96 sm:h-96 bg-cyan-500/25 rounded-full blur-3xl pointer-events-none transition-colors duration-1000';
+        orb2.className = 'fixed top-1/3 -right-24 w-72 h-72 sm:w-96 sm:h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none transition-colors duration-1000';
+      } else if (themeName === 'violet') {
+        plaque.classList.add('glow-purple');
+        orb1.className = 'fixed -top-24 -left-24 w-72 h-72 sm:w-96 sm:h-96 bg-purple-500/25 rounded-full blur-3xl pointer-events-none transition-colors duration-1000';
+        orb2.className = 'fixed top-1/3 -right-24 w-72 h-72 sm:w-96 sm:h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none transition-colors duration-1000';
+      }
+    }
+
+    let countdownInterval = null;
+    let celebrationFired = false;
+
+    function startCountdown() {
+      if (countdownInterval) clearInterval(countdownInterval);
+
+      function update() {
+        const target = new Date(cardState.targetDate).getTime();
+        const now = Date.now();
+        const diff = target - now;
+
+        const daysEl = document.getElementById('cd-days');
+        const hoursEl = document.getElementById('cd-hours');
+        const minEl = document.getElementById('cd-minutes');
+        const secEl = document.getElementById('cd-seconds');
+        const titleEl = document.getElementById('countdown-title');
+        const subTitleEl = document.getElementById('countdown-subtitle');
+
+        if (diff <= 0 || cardState.forcedCelebration) {
+          daysEl.innerText = "00";
+          hoursEl.innerText = "00";
+          minEl.innerText = "00";
+          secEl.innerText = "00";
+
+          titleEl.innerText = `🎉 Happy Birthday, ${cardState.name}! 🎉`;
+          subTitleEl.innerText = "Today is your day! Te quiero con todo mi corazón ✨💕";
+          
+          if (!celebrationFired) {
+            triggerMegaCelebration();
+            celebrationFired = true;
+          }
+          return;
+        }
+
+        celebrationFired = false;
+        titleEl.innerText = "The Birthday Countdown";
+        subTitleEl.innerText = "Friday, September 25, 2026 • 12:00 AM (EDT)";
+
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+        daysEl.innerText = String(d).padStart(2, '0');
+        hoursEl.innerText = String(h).padStart(2, '0');
+        minEl.innerText = String(m).padStart(2, '0');
+        secEl.innerText = String(s).padStart(2, '0');
+      }
+
+      update();
+      countdownInterval = setInterval(update, 1000);
+    }
+
+    function triggerMegaCelebration() {
+      if (typeof confetti === 'function') {
+        const end = Date.now() + 3000;
+        const colors = ['#f43f5e', '#fb7185', '#eab308', '#6366f1', '#ec4899'];
+
+        (function frame() {
+          confetti({
+            particleCount: 5,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0, y: 0.8 },
+            colors: colors
+          });
+          confetti({
+            particleCount: 5,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1, y: 0.8 },
+            colors: colors
+          });
+
+          if (Date.now() < end) {
+            requestAnimationFrame(frame);
+          }
+        }());
+      }
+      playHappyChimeChord();
+      triggerHaptic(50);
+    }
+
+    // Celebration Toggle
+    const forceCelebrateBtn = document.getElementById('btn-force-celebrate');
+    const celebrateBtnText = document.getElementById('celebrate-btn-text');
+    forceCelebrateBtn.addEventListener('click', () => {
+      cardState.forcedCelebration = !cardState.forcedCelebration;
+      if (cardState.forcedCelebration) {
+        celebrateBtnText.innerText = "Exit Celebration Mode";
+        celebrationFired = false;
+        triggerMegaCelebration();
+      } else {
+        celebrateBtnText.innerText = "Preview Celebration Mode";
+      }
+    });
+
+    // 3D Envelope Interactions
+    const envelope = document.getElementById('envelope');
+    const envelopeWrapper = document.getElementById('envelope-wrapper');
+    const readFullCardBtn = document.getElementById('read-full-card-btn');
+    const fullCardSection = document.getElementById('full-card-section');
+
+    function toggleEnvelopeOpen() {
+      initAudio();
+      triggerHaptic(30);
+      cardState.isEnvelopeOpen = !cardState.isEnvelopeOpen;
+      if (cardState.isEnvelopeOpen) {
+        envelope.classList.add('open');
+        playHappyChimeChord();
+        if (typeof confetti === 'function') {
+          confetti({
+            particleCount: 35,
+            spread: 60,
+            origin: { y: 0.55 }
+          });
+        }
+      } else {
+        envelope.classList.remove('open');
+      }
+    }
+
+    envelopeWrapper.addEventListener('click', (e) => {
+      if (e.target.id === 'read-full-card-btn' || e.target.closest('#read-full-card-btn')) return;
+      toggleEnvelopeOpen();
+    });
+
+    readFullCardBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      triggerHaptic(20);
+      fullCardSection.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Interactive Cake mechanics
+    const cakeContainer = document.getElementById('cake-container');
+    const cakeStatusBadge = document.getElementById('cake-status-badge');
+    const relightBtn = document.getElementById('relight-cake-btn');
+
+    function blowOutCandles() {
+      if (!cardState.candlesLit) return;
+      initAudio();
+      triggerHaptic([30, 50, 40]);
+      cardState.candlesLit = false;
+
+      playBlowCandleSound();
+
+      const flames = document.querySelectorAll('.candle-flame');
+      flames.forEach(flame => {
+        flame.style.display = 'none';
+
+        const smoke = document.createElement('div');
+        smoke.className = 'smoke-particle';
+        flame.parentElement.appendChild(smoke);
+        setTimeout(() => smoke.remove(), 1100);
+      });
+
+      cakeStatusBadge.innerText = 'Wish Made for Baby! ✨';
+      cakeStatusBadge.className = 'px-2.5 py-1 text-[10px] rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-medium';
+      relightBtn.classList.remove('hidden');
+
+      setTimeout(() => {
+        playHappyChimeChord();
+        if (typeof confetti === 'function') {
+          confetti({
+            particleCount: 45,
+            spread: 70,
+            origin: { y: 0.7 }
+          });
+        }
+      }, 350);
+    }
+
+    function relightCandles() {
+      triggerHaptic(20);
+      cardState.candlesLit = true;
+      document.querySelectorAll('.candle-flame').forEach(f => f.style.display = 'block');
+      cakeStatusBadge.innerText = 'Candles Lit 🔥';
+      cakeStatusBadge.className = 'px-2.5 py-1 text-[10px] rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium';
+      relightBtn.classList.add('hidden');
+    }
+
+    cakeContainer.addEventListener('click', blowOutCandles);
+    cakeContainer.addEventListener('touchmove', blowOutCandles, { passive: true });
+    relightBtn.addEventListener('click', relightCandles);
+
+    // Scratch Card with DPI-scaling
+    const scratchCanvas = document.getElementById('scratch-canvas');
+    const scratchBadge = document.getElementById('scratch-percent-badge');
+    const resetScratchBtn = document.getElementById('reset-scratch-btn');
+    let sCtx = null;
+    let isDrawing = false;
+    let scratchRevealed = false;
+
+    function initScratchCard() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = scratchCanvas.getBoundingClientRect();
+      const width = rect.width || 270;
+      const height = rect.height || 144;
+
+      scratchCanvas.width = width * dpr;
+      scratchCanvas.height = height * dpr;
+
+      sCtx = scratchCanvas.getContext('2d');
+      sCtx.scale(dpr, dpr);
+
+      const grad = sCtx.createLinearGradient(0, 0, width, height);
+      grad.addColorStop(0, '#fda4af');
+      grad.addColorStop(0.5, '#f43f5e');
+      grad.addColorStop(1, '#e11d48');
+
+      sCtx.fillStyle = grad;
+      sCtx.fillRect(0, 0, width, height);
+
+      sCtx.fillStyle = '#ffffff';
+      sCtx.font = 'bold 11px Outfit, sans-serif';
+      sCtx.textAlign = 'center';
+      sCtx.fillText('★ SCRATCH WITH FINGER TO REVEAL ★', width / 2, height / 2 + 4);
+
+      scratchBadge.innerText = '0% Scratched';
+      scratchRevealed = false;
+    }
+
+    function scratchAt(x, y) {
+      if (!sCtx) return;
+      sCtx.globalCompositeOperation = 'destination-out';
+      sCtx.beginPath();
+      sCtx.arc(x, y, 22, 0, Math.PI * 2, false);
+      sCtx.fill();
+
+      checkScratchPercentage();
+    }
+
+    function checkScratchPercentage() {
+      if (scratchRevealed) return;
+      const w = scratchCanvas.width;
+      const h = scratchCanvas.height;
+
+      const imgData = sCtx.getImageData(0, 0, w, h);
+      let clearedPixels = 0;
+      const totalPixels = imgData.data.length / 4;
+
+      for (let i = 3; i < imgData.data.length; i += 24) {
+        if (imgData.data[i] === 0) clearedPixels++;
+      }
+
+      const percent = Math.round((clearedPixels / (totalPixels / 6)) * 100);
+      scratchBadge.innerText = `${Math.min(100, percent)}% Scratched`;
+
+      if (percent > 40 && !scratchRevealed) {
+        scratchRevealed = true;
+        sCtx.clearRect(0, 0, w, h);
+        scratchBadge.innerText = 'Unlocked for Baby! 💕';
+        scratchBadge.className = 'px-2.5 py-1 text-[10px] rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-medium';
+        playHappyChimeChord();
+        triggerHaptic(50);
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 35, spread: 60, origin: { y: 0.8 } });
+        }
+      }
+    }
+
+    function getScratchPointerPos(e) {
+      const rect = scratchCanvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    scratchCanvas.addEventListener('mousedown', (e) => {
+      isDrawing = true;
+      const pos = getScratchPointerPos(e);
+      scratchAt(pos.x, pos.y);
+    });
+
+    scratchCanvas.addEventListener('mousemove', (e) => {
+      if (!isDrawing) return;
+      const pos = getScratchPointerPos(e);
+      scratchAt(pos.x, pos.y);
+    });
+
+    window.addEventListener('mouseup', () => { isDrawing = false; });
+
+    scratchCanvas.addEventListener('touchstart', (e) => {
+      isDrawing = true;
+      const pos = getScratchPointerPos(e);
+      scratchAt(pos.x, pos.y);
+      triggerHaptic(10);
+    }, { passive: true });
+
+    scratchCanvas.addEventListener('touchmove', (e) => {
+      if (!isDrawing) return;
+      const pos = getScratchPointerPos(e);
+      scratchAt(pos.x, pos.y);
+    }, { passive: true });
+
+    scratchCanvas.addEventListener('touchend', () => {
+      isDrawing = false;
+    });
+
+    resetScratchBtn.addEventListener('click', () => {
+      triggerHaptic(15);
+      initScratchCard();
+    });
+
+    document.getElementById('poppers-btn').addEventListener('click', () => {
+      initAudio();
+      triggerMegaCelebration();
+      showToast("Celebration for Baby!", "🎉");
+    });
+
+    // Customizer Modal Logic
+    const editorModal = document.getElementById('editor-modal');
+    const openEditorBtn = document.getElementById('open-editor-btn');
+    const mobileFabBtn = document.getElementById('mobile-fab-btn');
+    const closeEditorBtn = document.getElementById('close-editor-btn');
+    const saveCustomizerBtn = document.getElementById('save-customizer-btn');
+    const copyShareLinkBtn = document.getElementById('copy-share-link-btn');
+    const copyBtnText = document.getElementById('copy-btn-text');
+
+    function openEditor() {
+      editorModal.classList.remove('hidden');
+      triggerHaptic(15);
+    }
+
+    function closeEditor() {
+      editorModal.classList.add('hidden');
+    }
+
+    openEditorBtn.addEventListener('click', openEditor);
+    mobileFabBtn.addEventListener('click', openEditor);
+    closeEditorBtn.addEventListener('click', closeEditor);
+
+    document.querySelectorAll('.theme-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const theme = btn.getAttribute('data-theme');
+        applyTheme(theme);
+        triggerHaptic(15);
+        showToast(`Theme switched to ${theme.toUpperCase()}`, "🎨");
+      });
+    });
+
+    saveCustomizerBtn.addEventListener('click', () => {
+      const inputName = document.getElementById('input-recipient-name');
+      const inputTarget = document.getElementById('input-target-date');
+      const inputMsg = document.getElementById('input-card-message');
+      const inputSecret = document.getElementById('input-scratch-secret');
+
+      cardState.name = inputName ? inputName.value.trim() || 'Baby' : 'Baby';
+      cardState.targetDate = inputTarget ? inputTarget.value.trim() || TARGET_TIME_ISO : TARGET_TIME_ISO;
+      cardState.message = inputMsg ? inputMsg.value.trim() : cardState.message;
+      cardState.scratchSecret = inputSecret ? inputSecret.value.trim() : cardState.scratchSecret;
+
+      syncStateToDOM();
+      startCountdown();
+      initScratchCard();
+
+      closeEditor();
+      triggerHaptic(30);
+      showToast("Birthday card saved!", "💖");
+    });
+
+    // Native Web Share API + Clipboard Fallback
+    copyShareLinkBtn.addEventListener('click', async () => {
+      const inputName = document.getElementById('input-recipient-name');
+      const inputTarget = document.getElementById('input-target-date');
+      const inputMsg = document.getElementById('input-card-message');
+      const inputSecret = document.getElementById('input-scratch-secret');
+
+      const shareData = {
+        name: inputName ? inputName.value.trim() || 'Baby' : 'Baby',
+        targetDate: inputTarget ? inputTarget.value.trim() || TARGET_TIME_ISO : TARGET_TIME_ISO,
+        message: inputMsg ? inputMsg.value.trim() : cardState.message,
+        scratchSecret: inputSecret ? inputSecret.value.trim() : cardState.scratchSecret,
+        theme: cardState.theme
+      };
+
+      const encoded = btoa(encodeURIComponent(JSON.stringify(shareData)));
+      const shareUrl = `${window.location.origin}${window.location.pathname}#${encoded}`;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: `Birthday Card for ${shareData.name}! 🎂`,
+            text: `Happy Birthday to my favorite person! 🎉🎂 Open your interactive card:`,
+            url: shareUrl
+          });
+          showToast("Shared successfully!", "✨");
+          return;
+        } catch (err) {}
+      }
+
+      const tempInput = document.createElement('input');
+      tempInput.value = shareUrl;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+        copyBtnText.innerText = "Copied!";
+        showToast("Card link copied to clipboard!", "🔗");
+        setTimeout(() => { copyBtnText.innerText = "Share Link"; }, 2500);
+      } catch (err) {
+        showToast("Copy URL from browser bar", "⚠️");
+      }
+      document.body.removeChild(tempInput);
+    });
+
+    window.addEventListener('resize', () => {
+      initScratchCard();
+    });
+
+    window.addEventListener('load', () => {
+      loadStateFromURL();
+      syncStateToDOM();
+      startCountdown();
+      initScratchCard();
+    });
+  </script>
+</body>
+</html>
